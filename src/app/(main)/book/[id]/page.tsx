@@ -17,6 +17,25 @@ function formatReviewDate(date: Date) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(date);
 }
 
+function buildRatingBuckets(reviews: { rating: number }[]) {
+  const counts = [0, 0, 0, 0, 0];
+  for (const review of reviews) {
+    const stars = Math.min(5, Math.max(1, Math.round(review.rating / 2)));
+    counts[stars - 1]++;
+  }
+
+  const total = reviews.length;
+
+  return [5, 4, 3, 2, 1].map((stars) => {
+    const count = counts[stars - 1];
+    return {
+      stars,
+      count,
+      pct: total > 0 ? Math.round((count / total) * 100) : 0,
+    };
+  });
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -84,6 +103,8 @@ export default async function BookPage({
       : null;
 
   const averageRatingOutOfFive = averageRating ? averageRating / 2 : null
+
+  const ratingBuckets = buildRatingBuckets(reviews);
 
   return (
     <main className="min-h-screen py-10">
@@ -209,7 +230,6 @@ export default async function BookPage({
               <RatingWidget
                 bookId={book.id}
                 initialRating={myReview?.rating}
-                initialContent={myReview?.content}
               />
             </div>
           )}
@@ -236,6 +256,25 @@ export default async function BookPage({
       {/* Reviews section: your own review form on top, everyone's reviews listed below */}
       <div className="mx-auto max-w-270 px-7 mt-8">
         <h2 className="text-lg font-semibold">Reviews</h2>
+
+        {reviews.length > 0 && (
+          <div className="mt-4 flex flex-col gap-2 rounded-[26px] bg-white p-5.5 shadow-[0_16px_36px_-30px_rgba(59,43,46,0.5)]" >
+            {ratingBuckets.map(({ stars, pct }) => (
+              <div key={stars} className="flex items-center gap-2.5 text-[13px] text-muted">
+                <span className="w-3.5 text-right text-[#584449]">{stars}</span>
+                <span className="text-[11px] text-[#c9aeb4]">★</span>
+                <span className="h-2.25 flex-1 overflow-hidden rounded-full bg-[#f6eff0]">
+                  <span
+                    className="block h-full rounded-full bg-accent"
+                    style={{ width: `${pct}%` }}
+                  />
+                </span>
+                <span className="w-8.5 text-right">{pct}%</span>
+              </div>
+            ))}
+          </div>
+
+        )}
 
         {/* Form is pre-filled + says "Update review" if you already reviewed this book */}
         {session?.user ? (
