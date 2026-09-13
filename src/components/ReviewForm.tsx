@@ -43,6 +43,7 @@ export default function ReviewForm({
 
   return (
     <form
+      id="review-form"
       onSubmit={handleSubmit}
       className="mt-4 flex flex-col gap-3 rounded-[26px] bg-white p-5.5 shadow-[0_16px_36px_-30px_rgba(59,43,46,0.5)]"
     >
@@ -51,6 +52,7 @@ export default function ReviewForm({
       <StarRatingInput value={rating / 2} onChange={(v) => setRating(v * 2)} disabled={saving} />
 
       <textarea
+        id="review-textarea"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="What stayed with you when you closed the book?"
