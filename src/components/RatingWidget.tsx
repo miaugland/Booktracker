@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import ReviewForm from "./ReviewForm";
 import StarRatingInput from "./StarRatingInput";
 
 const RATING_LABELS: Record<number, string> = {
@@ -16,17 +15,14 @@ const RATING_LABELS: Record<number, string> = {
 export default function RatingWidget({
     bookId,
     initialRating,
-    initialContent,
 }: {
     bookId: string,
     initialRating?: number;
-    initialContent?: string | null;
 }) {
     const router = useRouter();
     const [rating, setRating] = useState(initialRating ?? 0);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(false);
-    const [formOpen, setFormOpen] = useState(false);
 
     const ratingOutOfFive = rating / 2;
 
@@ -45,7 +41,7 @@ export default function RatingWidget({
                 body: JSON.stringify({
                     bookId,
                     rating: newRating,
-                    content: initialContent ?? "",
+                    content: "",
                 }),
             });
             if (!res.ok) throw new Error();
@@ -56,6 +52,14 @@ export default function RatingWidget({
         } finally {
             setSaving(false);
         }
+    }
+
+    function goToReviewForm() {
+        const form = document.getElementById("review-form");
+        form?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        const textarea = document.getElementById("review-textarea") as HTMLTextAreaElement | null;
+        textarea?.focus();
     }
 
     return (
@@ -72,17 +76,13 @@ export default function RatingWidget({
 
             {error && <p className="mt-1 text-sm text-error">Couldn't save rating</p>}
 
-            {!formOpen ? (
-                <button
-                    type="button"
-                    onClick={() => setFormOpen(true)}
-                    className="mt-3.5 rounded-full bg-accent px-4.5 py-2.5 text-[13.5px] text-white transition-colors hover:bg-accent-hover"
-                >
-                    Write a review
-                </button>
-            ) : (
-                <ReviewForm bookId={bookId} initialRating={rating || undefined} initialContent={initialContent} />
-            )}
+            <button
+                type="button"
+                onClick={goToReviewForm}
+                className="mt-3.5 rounded-full bg-accent px-4.5 py-2.5 text-[13.5px] text-white transition-colors hover:bg-accent-hover"
+            >
+                {initialRating ? "Edit your review" : "Write a review"}
+            </button>
         </div>
     )
 }
