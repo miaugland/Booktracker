@@ -2,21 +2,23 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import type { GoogleBookResult } from "@/lib/googleBooks";
 import AddToShelfButton from "@/components/AddToShelfButton";
 
 export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") ?? "";
+
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GoogleBookResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-
-    const trimmed = query.trim();
+  async function runSearch(term: string) {
+    const trimmed = term.trim();
     if (!trimmed) return;
 
     setLoading(true);
@@ -38,6 +40,17 @@ export default function SearchPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  useEffect(() => {
+    if (initialQuery) {
+      runSearch(initialQuery);
+    }
+  }, [initialQuery]);
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    runSearch(query);
   }
 
   return (
