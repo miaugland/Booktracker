@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Form from "next/form";
 import { auth } from "@/lib/auth";
 import AuthButton from "@/components/AuthButton";
 
@@ -15,9 +16,8 @@ export default async function Nav() {
           Tsundoku
         </Link>
 
-        <form
+        <Form
           action="/search"
-          method="GET"
           className="flex max-w-95 flex-1 items-center gap-2.5 rounded-full bg-white px-4.5 py-2.5 shadow-[0_6px_18px_-14px_rgba(59,43,46,0.5)]"
         >
           <span className="h-3.5 w-3.5 flex-none rounded-full border-[1.5px] border-muted-2" />
@@ -27,7 +27,7 @@ export default async function Nav() {
             placeholder="Search a title, an author, a mood"
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-muted"
           />
-        </form>
+        </Form>
 
         <nav className="ml-auto flex items-center gap-5.5 text-sm">
           <Link href="/search" className="text-muted hover:accent-accent-hover">
